@@ -1,6 +1,6 @@
 package algebras
 
-import domain.Price
+import domain.{Price, Symbol}
 
 trait PriceProvider[F[_]] {
   def fetch(symbol: Symbol): F[Price]

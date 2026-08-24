@@ -1,8 +1,8 @@
 package algebras
 
-import domain.Price
+import domain.{Price, Symbol}
 
 trait PriceRepository[F[_]] {
   def save(price: Price): F[Unit]
-  def history(symbol: Symbol, limit: Int): F[List[Price]]
+  def history(symbol: Symbol, baseCurrency: Symbol, limit: Int): F[List[Price]]
 }

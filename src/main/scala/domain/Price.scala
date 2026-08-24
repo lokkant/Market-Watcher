@@ -4,4 +4,9 @@ import java.time.Instant
 
 opaque type Symbol = String
 
-case class Price(symbol: Symbol, value: BigDecimal, time: Instant)
+object Symbol {
+  def apply(value: String): Symbol = value
+  extension (symbol: Symbol) def value: String = symbol
+}
+
+case class Price(symbol: Symbol, baseCurrency: Symbol, value: BigDecimal, time: Instant)
