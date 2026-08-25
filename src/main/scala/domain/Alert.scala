@@ -6,6 +6,7 @@ opaque type AlertId = UUID
 
 object AlertId {
   def apply(): AlertId = UUID.randomUUID()
+  def apply(value: UUID): AlertId = value
   extension (alertId: AlertId) def value: UUID = alertId
 }
 
