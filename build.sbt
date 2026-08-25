@@ -3,8 +3,12 @@ ThisBuild / version := "0.1.0-SNAPSHOT"
 ThisBuild / scalaVersion := "3.8.4"
 
 val http4sVersion = "0.23.36"
+val telegramiumVersion = "10.1002.0"
 
 libraryDependencies ++= Seq(
+  "io.github.apimorphism" %% "telegramium-core" % telegramiumVersion,
+  "io.github.apimorphism" %% "telegramium-high" % telegramiumVersion,
+
   "org.tpolecat" %% "doobie-core"     % "1.0.0-RC12",
   "org.xerial"   %  "sqlite-jdbc"     % "3.53.2.1",
 

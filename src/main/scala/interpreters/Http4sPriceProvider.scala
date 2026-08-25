@@ -1,8 +1,7 @@
 package interpreters
 
 import algebras.PriceProvider
-import cats.effect.IO
-import cats.effect.kernel.Resource
+import cats.effect.{IO, Resource}
 import domain.{FiatCurrencyCodes, Price, Symbol}
 import io.circe.{Decoder, Json}
 import org.http4s.circe.CirceEntityDecoder._
@@ -58,7 +57,6 @@ class Http4sPriceProvider private (
 }
 
 object Http4sPriceProvider {
-
   def apply(
       exchangeRateApiKey: String,
       coinMarketCapApiKey: String,
