@@ -106,4 +106,59 @@ class SQLiteAlertRepositorySpec extends CatsEffectSuite {
       repository.deactivate(unknownAlert.id)
     }
   }
+
+  test("activate makes a previously deactivated alert reappear in findActiveFor") {
+    repositoryResource.use { repository =>
+      val alert = Alert(Symbol("EUR"), Symbol("USD"), threshold = BigDecimal("1.10"), direction = Direction.Above)
+      for {
+        _       <- repository.add(alert)
+        _       <- repository.deactivate(alert.id)
+        _       <- repository.activate(alert.id)
+        results <- repository.findActiveFor(Symbol("EUR"))
+      } yield assertEquals(results, List(alert))
+    }
+  }
+
+  test("activate on an unknown alert id is a no-op") {
+    repositoryResource.use { repository =>
+      val unknownAlert = Alert(Symbol("EUR"), Symbol("USD"), threshold = BigDecimal("1.10"), direction = Direction.Above)
+      repository.activate(unknownAlert.id)
+    }
+  }
+
+  test("delete removes the alert so findActiveFor and re-activation can no longer see it") {
+    repositoryResource.use { repository =>
+      val alert = Alert(Symbol("EUR"), Symbol("USD"), threshold = BigDecimal("1.10"), direction = Direction.Above)
+      for {
+        _       <- repository.add(alert)
+        _       <- repository.delete(alert.id)
+        results <- repository.findActiveFor(Symbol("EUR"))
+        _       <- repository.activate(alert.id) // no-op: row is gone, not just deactivated
+        after   <- repository.findActiveFor(Symbol("EUR"))
+      } yield {
+        assertEquals(results, Nil)
+        assertEquals(after, Nil)
+      }
+    }
+  }
+
+  test("delete only removes the targeted alert, not others for the same symbol") {
+    repositoryResource.use { repository =>
+      val toDelete  = Alert(Symbol("EUR"), Symbol("USD"), threshold = BigDecimal("1.10"), direction = Direction.Above)
+      val untouched = Alert(Symbol("EUR"), Symbol("USD"), threshold = BigDecimal("0.90"), direction = Direction.Below)
+      for {
+        _       <- repository.add(toDelete)
+        _       <- repository.add(untouched)
+        _       <- repository.delete(toDelete.id)
+        results <- repository.findActiveFor(Symbol("EUR"))
+      } yield assertEquals(results, List(untouched))
+    }
+  }
+
+  test("delete on an unknown alert id is a no-op") {
+    repositoryResource.use { repository =>
+      val unknownAlert = Alert(Symbol("EUR"), Symbol("USD"), threshold = BigDecimal("1.10"), direction = Direction.Above)
+      repository.delete(unknownAlert.id)
+    }
+  }
 }
